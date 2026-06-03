@@ -11,12 +11,14 @@ from bot_spred.models import Quote
 class GatePerpClient(ExchangeClient):
     name = "gate"
 
-    def __init__(self, session: aiohttp.ClientSession) -> None:
+    def __init__(self, session: aiohttp.ClientSession, request_timeout_seconds: float) -> None:
         self._session = session
+        self._request_timeout = aiohttp.ClientTimeout(total=request_timeout_seconds)
 
     async def fetch_perp_quotes(self) -> dict[str, Quote]:
         async with self._session.get(
-            "https://api.gateio.ws/api/v4/futures/usdt/tickers", timeout=10
+            "https://api.gateio.ws/api/v4/futures/usdt/tickers",
+            timeout=self._request_timeout,
         ) as response:
             response.raise_for_status()
             tickers = await response.json()

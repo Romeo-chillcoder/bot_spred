@@ -21,7 +21,7 @@ MVP Telegram-бот сканування спредів (alert-only) для CEX 
 - Повідомлення у timezone `Europe/Kyiv` + `Verified after Xs delay`.
 - Каркас для розширення:
   - exchange interface для додавання нових CEX
-  - `SpotSpotScanner` placeholder для spot/spot.
+  - `fetch_spot_quotes` interface у базовому exchange-клієнті для spot/spot.
 
 ## Налаштування
 
@@ -52,6 +52,7 @@ python -m pytest -q
 - `ENABLED_EXCHANGES` (наприклад: `binance,gate`)
 - `SCAN_INTERVAL_SECONDS`
 - `VERIFY_DELAY_SECONDS`
+- `REQUEST_TIMEOUT_SECONDS`
 - `PROD_PERP_SPREAD_THRESHOLD` (за замовчуванням `10.0`)
 - `TEST_PERP_SPREAD_THRESHOLD` (за замовчуванням `0.0`)
 - `COOLDOWN_AFTER_ALERT`

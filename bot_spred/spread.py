@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import Iterable, List
+from typing import Iterable
 
 from bot_spred.models import Quote, SpreadRoute
 
@@ -11,7 +11,7 @@ def execution_aware_spread_pct(buy_price: float, sell_price: float) -> float:
     return (sell_price - buy_price) / buy_price * 100.0
 
 
-def build_perp_routes(symbol: str, quotes: Iterable[Quote]) -> List[SpreadRoute]:
+def build_perp_routes(symbol: str, quotes: Iterable[Quote]) -> list[SpreadRoute]:
     quote_list = [q for q in quotes if q.ask > 0 and q.bid > 0]
     routes: list[SpreadRoute] = []
     for long_quote in quote_list:

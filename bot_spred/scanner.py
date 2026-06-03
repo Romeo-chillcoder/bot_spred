@@ -30,13 +30,18 @@ class PerpPerpScanner:
         self._verify_delay_seconds = verify_delay_seconds
 
     async def scan_and_notify_once(self) -> None:
-        if self._verify_delay_seconds > 0:
-            await self._fetch_symbol_quotes()
-            await asyncio.sleep(self._verify_delay_seconds)
+        initial_quotes = await self._fetch_symbol_quotes()
+        candidate_symbols = {symbol for symbol, quotes in initial_quotes.items() if len(quotes) >= 2}
 
-        verified_quotes = await self._fetch_symbol_quotes()
+        verified_quotes = initial_quotes
+        if self._verify_delay_seconds > 0 and candidate_symbols:
+            await asyncio.sleep(self._verify_delay_seconds)
+            verified_quotes = await self._fetch_symbol_quotes()
+
         now = time.time()
-        for symbol, quotes in verified_quotes.items():
+        symbols_to_check = candidate_symbols if self._verify_delay_seconds > 0 else set(verified_quotes)
+        for symbol in symbols_to_check:
+            quotes = verified_quotes.get(symbol, [])
             routes = build_perp_routes(symbol, quotes)
             if not routes:
                 continue
@@ -65,8 +70,3 @@ class PerpPerpScanner:
             for symbol, quote in result.items():
                 by_symbol[symbol].append(quote)
         return by_symbol
-
-
-class SpotSpotScanner:
-    async def scan_and_notify_once(self) -> None:
-        return

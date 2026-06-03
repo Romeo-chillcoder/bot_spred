@@ -14,13 +14,13 @@ class Settings:
     enabled_exchanges: list[str]
     scan_interval_seconds: float
     verify_delay_seconds: float
+    request_timeout_seconds: float
     prod_perp_spread_threshold: float
     test_perp_spread_threshold: float
     cooldown_after_alert: float
     realert_if_spread_increases_by: float
     realert_max_interval: float
     hysteresis: float
-
 
 
 def load_settings() -> Settings:
@@ -47,6 +47,7 @@ def load_settings() -> Settings:
         enabled_exchanges=enabled_exchanges,
         scan_interval_seconds=float(os.getenv("SCAN_INTERVAL_SECONDS", "5")),
         verify_delay_seconds=float(os.getenv("VERIFY_DELAY_SECONDS", "2")),
+        request_timeout_seconds=float(os.getenv("REQUEST_TIMEOUT_SECONDS", "10")),
         prod_perp_spread_threshold=float(os.getenv("PROD_PERP_SPREAD_THRESHOLD", "10.0")),
         test_perp_spread_threshold=float(os.getenv("TEST_PERP_SPREAD_THRESHOLD", "0.0")),
         cooldown_after_alert=float(os.getenv("COOLDOWN_AFTER_ALERT", "30")),

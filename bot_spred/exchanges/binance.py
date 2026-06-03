@@ -11,27 +11,33 @@ from bot_spred.models import Quote
 class BinancePerpClient(ExchangeClient):
     name = "binance"
 
-    def __init__(self, session: aiohttp.ClientSession) -> None:
+    def __init__(self, session: aiohttp.ClientSession, request_timeout_seconds: float) -> None:
         self._session = session
+        self._request_timeout = aiohttp.ClientTimeout(total=request_timeout_seconds)
 
     async def fetch_perp_quotes(self) -> dict[str, Quote]:
         async with self._session.get(
-            "https://fapi.binance.com/fapi/v1/ticker/bookTicker", timeout=10
+            "https://fapi.binance.com/fapi/v1/ticker/bookTicker",
+            timeout=self._request_timeout,
         ) as response:
             response.raise_for_status()
             tickers = await response.json()
 
         async with self._session.get(
-            "https://fapi.binance.com/fapi/v1/premiumIndex", timeout=10
+            "https://fapi.binance.com/fapi/v1/premiumIndex",
+            timeout=self._request_timeout,
         ) as response:
             response.raise_for_status()
             funding_items = await response.json()
 
-        funding_by_symbol = {
-            item.get("symbol"): float(item.get("lastFundingRate", "0") or 0)
-            for item in funding_items
-            if isinstance(item, dict) and item.get("symbol")
-        }
+        funding_by_symbol = {}
+        for item in funding_items:
+            if not isinstance(item, dict) or not item.get("symbol"):
+                continue
+            funding_raw = item.get("lastFundingRate")
+            funding_by_symbol[item["symbol"]] = (
+                float(funding_raw) if funding_raw not in (None, "") else None
+            )
 
         now = time.time()
         quotes: dict[str, Quote] = {}

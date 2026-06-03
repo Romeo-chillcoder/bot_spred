@@ -18,12 +18,14 @@ class TelegramNotifier:
         test_chat_id: int,
         prod_chat_id: int,
         prod_perp_threshold: float,
+        request_timeout_seconds: float,
     ) -> None:
         self._session = session
         self._token = token
         self._test_chat_id = test_chat_id
         self._prod_chat_id = prod_chat_id
         self._prod_perp_threshold = prod_perp_threshold
+        self._request_timeout = aiohttp.ClientTimeout(total=request_timeout_seconds)
 
     async def notify_perp(
         self,
@@ -39,7 +41,9 @@ class TelegramNotifier:
     async def _send_message(self, chat_id: int, text: str) -> None:
         endpoint = f"https://api.telegram.org/bot{self._token}/sendMessage"
         payload = {"chat_id": chat_id, "text": text}
-        async with self._session.post(endpoint, json=payload, timeout=10) as response:
+        async with self._session.post(
+            endpoint, json=payload, timeout=self._request_timeout
+        ) as response:
             response.raise_for_status()
 
     def _format_perp_message(

@@ -9,7 +9,7 @@ def test_execution_aware_spread_pct():
     assert result == pytest.approx(10.0)
 
 
-def test_execution_aware_spread_pct_requires_positive_buy_price():
+def test_execution_aware_spread_pct_rejects_non_positive_buy_price():
     with pytest.raises(ValueError):
         execution_aware_spread_pct(0.0, 110.0)
 

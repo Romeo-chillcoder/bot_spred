@@ -22,9 +22,11 @@ async def run() -> None:
         exchanges = []
         for exchange_name in settings.enabled_exchanges:
             if exchange_name == "binance":
-                exchanges.append(BinancePerpClient(session))
+                exchanges.append(
+                    BinancePerpClient(session, settings.request_timeout_seconds)
+                )
             elif exchange_name == "gate":
-                exchanges.append(GatePerpClient(session))
+                exchanges.append(GatePerpClient(session, settings.request_timeout_seconds))
 
         if len(exchanges) < 2:
             raise ValueError("At least 2 exchanges must be enabled for perp/perp scanning")
@@ -35,6 +37,7 @@ async def run() -> None:
             test_chat_id=settings.test_chat_id,
             prod_chat_id=settings.prod_chat_id,
             prod_perp_threshold=settings.prod_perp_spread_threshold,
+            request_timeout_seconds=settings.request_timeout_seconds,
         )
 
         test_state_machine = AlertStateMachine(
